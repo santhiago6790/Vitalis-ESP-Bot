@@ -2,33 +2,42 @@ import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 import OpenAI from "openai";
+import path from "path";
+import { fileURLToPath } from "url";
 
 dotenv.config();
 
 const app = express();
+
+// ===== CONFIG PATH (para Render + HTML) =====
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// ===== MIDDLEWARE =====
 app.use(cors());
 app.use(express.json());
+app.use(express.static(__dirname));
 
-// 🔥 IMPORTANTE: Render health check
+// ===== FRONTEND =====
 app.get("/", (req, res) => {
-  res.send("Vitalis API funcionando 🚀");
+  res.sendFile(path.join(__dirname, "index.html"));
 });
 
-// 🔑 OpenAI
+// ===== OPENAI =====
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
-// 🧠 memoria simple (chat tipo ChatGPT)
+// ===== MEMORIA CHAT =====
 let messages = [
   {
     role: "system",
     content:
-      "Eres Vitalis, un asistente médico virtual claro, humano y directo. Ayudas con síntomas y salud sin ser robótico."
+      "Eres Vitalis, un asistente médico virtual claro, humano y directo. Ayudas con síntomas y salud de forma sencilla."
   }
 ];
 
-// 💬 CHAT ROUTE
+// ===== CHAT ROUTE =====
 app.post("/chat", async (req, res) => {
   try {
     const userMessage = req.body.message;
@@ -62,8 +71,8 @@ app.post("/chat", async (req, res) => {
   }
 });
 
-// 🔥 IMPORTANTE PARA RENDER
-const PORT = process.env.PORT || 3000;
+// ===== PORT RENDER =====
+const PORT = process.env.PORT || 10000;
 
 app.listen(PORT, () => {
   console.log("Servidor corriendo en puerto", PORT);
