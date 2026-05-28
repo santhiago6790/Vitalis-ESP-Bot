@@ -1,26 +1,30 @@
 import express from "express";
 import cors from "cors";
+import dotenv from "dotenv";
 import OpenAI from "openai";
+
+dotenv.config();
 
 const app = express();
 
 app.use(cors());
 app.use(express.json());
 
+// 🔥 ESTO es lo que evita "Cannot GET /"
 app.get("/", (req, res) => {
   res.send("Vitalis API funcionando 🚀");
 });
 
 const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY?.trim(),
+  apiKey: process.env.OPENAI_API_KEY,
 });
 
-// Memoria del chat con las instrucciones de médico empático corregidas
 let historialMensajes = [
-    { 
-        role: "system", 
-        content: "Eres Vitalis, un médico experto y empático de Vitalis EPS. Tu prioridad absoluta es atender y responder DIRECTAMENTE a los síntomas, dolores o preguntas de salud que te haga el usuario. NO saludes de forma robótica ni repitas un menú de servicios si el usuario te está manifestando un dolor. Si te dice que le duele algo, bríndale orientación médica inmediata, consejos de alivio y apoyo humano. Sé directo, profesional y muy natural." 
-    }
+  {
+    role: "system",
+    content:
+      "Eres Vitalis, un médico experto y empático. Respondes claro, humano y directo."
+  }
 ];
 
 app.post("/chat", async (req, res) => {
@@ -28,42 +32,37 @@ app.post("/chat", async (req, res) => {
     const userMessage = req.body.message;
 
     if (!userMessage) {
-        return res.status(400).json({ error: "El mensaje es obligatorio" });
+      return res.status(400).json({ error: "Mensaje vacío" });
     }
 
-    // 1. Guardamos el nuevo mensaje del usuario en la memoria
     historialMensajes.push({
       role: "user",
-      content: userMessage
+      content: userMessage,
     });
 
-    // 2. Le mandamos todo el historial acumulado a OpenAI
     const completion = await openai.chat.completions.create({
       model: "gpt-4o-mini",
-      messages: historialMensajes
+      messages: historialMensajes,
     });
 
     const botReply = completion.choices[0].message.content;
 
-    // 3. Guardamos la respuesta de Vitalis en la memoria
     historialMensajes.push({
       role: "assistant",
-      content: botReply
+      content: botReply,
     });
 
-    // 4. Devolvemos la respuesta real al frontend
-    res.json({
-      reply: botReply
-    });
+    res.json({ reply: botReply });
 
   } catch (error) {
     console.log(error);
-    res.status(500).json({
-      error: "Error con OpenAI"
-    });
+    res.status(500).json({ error: "Error OpenAI" });
   }
 });
 
-app.listen(3000, () => {
-  console.log("Servidor funcionando en puerto 3000");
+// IMPORTANTE: Render necesita puerto dinámico
+const PORT = process.env.PORT || 3000;
+
+app.listen(PORT, () => {
+  console.log("Servidor funcionando en puerto", PORT);
 });
