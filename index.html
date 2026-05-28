@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
+  <title>Vitalis EPS | Asistente IA de Salud</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Inter', sans-serif;
+    }
+
+    body {
+      background: radial-gradient(circle at 10% 20%, #eef5ff, #dce6f5);
+      overflow-x: hidden;
+    }
+
+    /* Partículas de fondo */
+    #particlesCanvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.4;
+    }
+
+    .main-content {
+      position: relative;
+      z-index: 2;
+    }
+
+    /* Estilos generales del sitio */
+    .glass-card, .navbar, section, footer {
+      backdrop-filter: blur(12px);
+      background: rgba(255, 255, 255, 0.3);
+      border-radius: 2rem;
+      border: 1px solid rgba(255, 255, 255, 0.5);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.05);
+    }
+
+    .gradient-text {
+      background: linear-gradient(135deg, #1A6B5E, #2D9CDB);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .navbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 2rem;
+      margin: 1.5rem 2rem;
+      border-radius: 3rem;
+    }
+
+    .logo {
+      font-size: 1.8rem;
+      font-weight: 700;
+      background: linear-gradient(120deg, #0F4C5C, #2AA9A9);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 2rem;
+      font-weight: 500;
+    }
+
+    .nav-links a {
+      text-decoration: none;
+      color: #0a2b3e;
+      transition: 0.2s;
+    }
+
+    .hero {
+      padding: 5rem 2rem 4rem;
+      text-align: center;
+    }
+
+    .hero h1 {
+      font-size: 4rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+    }
+
+    .hero p {
+      font-size: 1.2rem;
+      max-width: 600px;
+      margin: 0 auto;
+      opacity: 0.8;
+    }
+
+    section {
+      margin: 4rem 2rem;
+      padding: 2rem;
+      border-radius: 2rem;
+    }
+
+    .section-title {
+      font-size: 2rem;
+      font-weight: 600;
+      margin-bottom: 2rem;
+      text-align: center;
+    }
+
+    .services-grid, .specialties-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .service-card, .specialty-card {
+      background: rgba(255, 255, 240, 0.4);
+      padding: 1rem;
+      text-align: center;
+      border-radius: 1.5rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .service-card:hover, .specialty-card:hover {
+      transform: translateY(-3px);
+      background: rgba(255, 255, 240, 0.6);
+    }
+
+    .cita-form, .pqrs-form {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      max-width: 500px;
+      margin: auto;
+    }
+
+    input, select, textarea {
+      background: rgba(255, 255, 255, 0.7);
+      border: none;
+      padding: 0.9rem;
+      border-radius: 2rem;
+      outline: none;
+    }
+
+    button {
+      cursor: pointer;
+      transition: all 0.2s;
+      border: none;
+    }
+
+    button:hover {
+      transform: translateY(-2px);
+      filter: brightness(1.02);
+    }
+
+    footer {
+      text-align: center;
+      padding: 2rem;
+      margin: 1rem 2rem 2rem;
+    }
+
+    /* ========== CHATBOT FLOTANTE - DISEÑO PREMIUM TIPO ChatGPT ========== */
+    /* CONTENEDOR GENERAL */
+    .chatbot-container {
+      position: fixed;
+      bottom: 0;
+      right: 0;
+      z-index: 999;
+      pointer-events: none;
+    }
+
+    /* BOTÓN FLOTANTE */
+    .chat-toggle {
+      position: fixed;
+      bottom: 18px;
+      right: 18px;
+      width: 58px;
+      height: 58px;
+      border-radius: 50%;
+      z-index: 1001;
+      pointer-events: auto;
+      background: linear-gradient(145deg, #1E8F8F, #0f6b6b);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.8rem;
+      color: white;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      border: none;
+    }
+
+    .chat-toggle:hover {
+      transform: scale(1.05);
+      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.3);
+    }
+
+    /* VENTANA CHAT */
+    .chat-window {
+      position: fixed;
+      bottom: 85px;
+      right: 12px;
+      width: 380px;
+      height: 560px;
+      border-radius: 24px;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      background: rgba(5, 15, 35, 0.96);
+      backdrop-filter: blur(20px);
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
+      z-index: 1000;
+      pointer-events: auto;
+      transition: transform 0.25s cubic-bezier(0.2, 0.9, 0.4, 1.1), opacity 0.2s;
+      transform: scale(0);
+      opacity: 0;
+      transform-origin: bottom right;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+    }
+
+    .chat-window.open {
+      transform: scale(1);
+      opacity: 1;
+    }
+
+    /* HEADER */
+    .chat-header {
+      padding: 16px 18px;
+      min-height: 64px;
+      background: rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(10px);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      flex-shrink: 0;
+    }
+
+    .chat-header h3 {
+      color: white;
+      font-size: 0.95rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .chat-header h3 i {
+      color: #2AA9A9;
+      font-size: 1.1rem;
+    }
+
+    .close-chat {
+      cursor: pointer;
+      color: rgba(255, 255, 255, 0.6);
+      font-size: 1.1rem;
+      transition: 0.2s;
+    }
+
+    .close-chat:hover {
+      color: white;
+    }
+
+    /* ÁREA MENSAJES */
+    .chat-body {
+      flex: 1;
+      overflow-y: auto;
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      background: rgba(8, 14, 26, 0.4);
+    }
+
+    /* Scroll personalizado */
+    .chat-body::-webkit-scrollbar {
+      width: 4px;
+    }
+
+    .chat-body::-webkit-scrollbar-track {
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 10px;
+    }
+
+    .chat-body::-webkit-scrollbar-thumb {
+      background: rgba(42, 169, 169, 0.5);
+      border-radius: 10px;
+    }
+
+    /* Mensajes */
+    .message {
+      max-width: 85%;
+      padding: 0.7rem 1rem;
+      border-radius: 1.3rem;
+      font-size: 0.85rem;
+      line-height: 1.45;
+      animation: fadeSlideUp 0.25s ease;
+      word-wrap: break-word;
+    }
+
+    .message.user {
+      align-self: flex-end;
+      background: #2C7DA0;
+      color: white;
+      border-bottom-right-radius: 0.25rem;
+    }
+
+    .message.bot {
+      align-self: flex-start;
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(4px);
+      color: #f0f9ff;
+      border-bottom-left-radius: 0.25rem;
+    }
+
+    .message.typing {
+      font-style: italic;
+      background: rgba(255, 255, 255, 0.06);
+      color: #aaa;
+    }
+
+    .message.urgent {
+      background: rgba(220, 60, 50, 0.85);
+      color: white;
+      border-left: 3px solid #ffaa55;
+    }
+
+    @keyframes fadeSlideUp {
+      from {
+        opacity: 0;
+        transform: translateY(6px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* INPUT */
+    .chat-input-container {
+      padding: 12px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: rgba(10, 18, 35, 0.98);
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+      flex-shrink: 0;
+    }
+
+    /* INPUT TEXTO */
+    .chat-input {
+      flex: 1;
+      height: 48px;
+      border-radius: 999px;
+      padding: 0 18px;
+      border: none;
+      background: rgba(255, 255, 255, 0.08);
+      color: white;
+      font-size: 0.85rem;
+      outline: none;
+      transition: all 0.2s;
+    }
+
+    .chat-input:focus {
+      background: rgba(255, 255, 255, 0.14);
+      border: 1px solid rgba(42, 169, 169, 0.4);
+    }
+
+    .chat-input::placeholder {
+      color: rgba(255, 255, 255, 0.45);
+    }
+
+    /* BOTÓN ENVIAR */
+    .send-btn {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #1E8F8F, #0f6b6b);
+      border: none;
+      color: white;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+      flex-shrink: 0;
+    }
+
+    .send-btn:hover {
+      transform: scale(1.04);
+      background: linear-gradient(135deg, #2aa9a9, #148080);
+    }
+
+    /* RESPONSIVE MÓVIL */
+    @media (max-width: 768px) {
+      .chat-window {
+        width: calc(100vw - 32px);
+        max-width: 360px;
+        height: 520px;
+        right: 12px;
+        bottom: 80px;
+      }
+
+      .navbar {
+        flex-direction: column;
+        gap: 1rem;
+        margin: 1rem;
+      }
+
+      .nav-links {
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 1rem;
+      }
+
+      section {
+        margin: 2rem 1rem;
+        padding: 1.5rem;
+      }
+
+      .hero h1 {
+        font-size: 2.5rem;
+      }
+
+      .services-grid, .specialties-grid {
+        grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+        gap: 1rem;
+      }
+
+      .chat-toggle {
+        bottom: 16px;
+        right: 16px;
+        width: 54px;
+        height: 54px;
+        font-size: 1.6rem;
+      }
+
+      .chat-body {
+        padding: 14px;
+        gap: 10px;
+      }
+
+      .message {
+        max-width: 90%;
+        padding: 0.6rem 0.9rem;
+        font-size: 0.8rem;
+      }
+    }
+
+    /* Ajustes para pantallas muy pequeñas */
+    @media (max-width: 480px) {
+      .chat-window {
+        width: calc(100vw - 24px);
+        max-width: 320px;
+        height: 500px;
+        right: 10px;
+        bottom: 76px;
+      }
+
+      .chat-input {
+        height: 44px;
+        padding: 0 14px;
+      }
+
+      .send-btn {
+        width: 44px;
+        height: 44px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <canvas id="particlesCanvas"></canvas>
+  <div class="main-content">
+    <nav class="navbar">
+      <div class="logo">✦ VITALIS EPS</div>
+      <div class="nav-links">
+        <a href="#inicio">Inicio</a>
+        <a href="#servicios">Servicios</a>
+        <a href="#especialidades">Especialidades</a>
+        <a href="#citas">Agendar cita</a>
+        <a href="#pqrs">PQRS</a>
+        <a href="#contacto">Contacto</a>
+      </div>
+    </nav>
+    <div id="inicio" class="hero">
+      <h1>Salud <span class="gradient-text">Inteligente</span> al instante</h1>
+      <p>Vitalis EPS: IA conversacional avanzada, autorizaciones ágiles y atención médica de vanguardia.</p>
+    </div>
+    <section style="text-align:center;">
+      <div style="display:flex; flex-wrap:wrap; gap:2rem; justify-content:center;">
+        <div style="flex:1; min-width:200px;"><i class="fas fa-robot" style="font-size:3rem; color:#1E8F8F;"></i><h3>IA Médica</h3><p>Chatbot con memoria y flujo natural.</p></div>
+        <div style="flex:1; min-width:200px;"><i class="fas fa-calendar-check" style="font-size:3rem; color:#2D9CDB;"></i><h3>Citas Ágiles</h3><p>Agenda en segundos sin perder contexto.</p></div>
+        <div style="flex:1; min-width:200px;"><i class="fas fa-prescription-bottle" style="font-size:3rem; color:#48BB78;"></i><h3>Medicamentos</h3><p>Gestión integral desde el chat.</p></div>
+      </div>
+    </section>
+    <section id="servicios"><h2 class="section-title">Servicios médicos</h2><div class="services-grid" id="servicesGrid"></div></section>
+    <section id="especialidades"><h2 class="section-title">Especialidades médicas</h2><div class="specialties-grid" id="specialtiesGrid"></div></section>
+    <section id="citas"><h2 class="section-title">📅 Agendar cita médica</h2><div class="cita-form"><input type="text" id="citaNombre" placeholder="Nombre completo"><input type="text" id="citaDoc" placeholder="Documento"><select id="citaServicio"><option value="">Selecciona servicio</option></select><input type="date" id="citaFecha"><input type="text" id="citaCiudad" placeholder="Ciudad"><button id="btnAgendarCita" style="background:#1E8F8F; color:white; padding:0.8rem; border-radius:3rem;">Agendar cita</button><div id="citaMensaje"></div></div></section>
+    <section id="pqrs"><h2 class="section-title">PQRS — Peticiones, Quejas, Reclamos</h2><div class="pqrs-form"><input type="text" id="pqrsNombre" placeholder="Nombre"><textarea id="pqrsMotivo" rows="3" placeholder="Cuéntanos tu caso..."></textarea><button id="btnEnviarPQRS" style="background:#4a6e8c; color:white; padding:0.8rem; border-radius:3rem;">Radicar PQRS</button></div></section>
+    <section id="contacto"><h2 class="section-title">Contacto oficial</h2><p style="text-align:center;">📞 Línea nacional: 01 8000 123 456 | ✉️ hola@vitaliseps.co | 💬 Chat disponible 24/7</p></section>
+    <footer><p>© 2025 Vitalis EPS — Transformación digital en salud, inteligencia artificial al servicio del bienestar.</p></footer>
+  </div>
+
+  <!-- CHATBOT FLOTANTE INDEPENDIENTE -->
+  <div class="chatbot-container">
+    <button class="chat-toggle" id="chatToggle">
+      <i class="fas fa-comment-dots"></i>
+    </button>
+    <div class="chat-window" id="chatWindow">
+      <div class="chat-header">
+        <h3><i class="fas fa-brain"></i> Vitalis AI · Asistente médico</h3>
+        <i class="fas fa-times close-chat" id="closeChat"></i>
+      </div>
+      <div class="chat-body" id="chatMessages">
+        <div class="message bot">✨ Hola, soy Vitalis, tu asistente de salud con IA. Cuéntame, ¿cómo te sientes hoy o en qué puedo ayudarte?</div>
+      </div>
+      <div class="chat-input-container">
+        <input type="text" class="chat-input" id="chatInput" placeholder="Escribe de forma natural..." autocomplete="off">
+        <button class="send-btn" id="chatSendBtn"><i class="fas fa-paper-plane"></i></button>
+      </div>
+    </div>
+  </div>
+
+ <script>
+    // ========== 1. CONFIGURACIÓN DE IA (CONEXIÓN ÚNICA AL BACKEND) ==========
+    async function askAI(message) {
+        try {
+            const response = await fetch("http://localhost:3000/chat", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ message: message })
+            });
+            const data = await response.json();
+            return data.reply;
+        } catch (error) {
+            console.error("Error al conectar con Vitalis IA:", error);
+            return "Lo siento, estoy teniendo problemas para conectarme con mi servidor médico. Asegúrate de tener la terminal negra encendida en el puerto 3000. 😔";
+        }
+    }
+
+    // ========== 2. UI ELEMENTOS DEL CHAT ==========
+    const chatMessagesDiv = document.getElementById("chatMessages");
+    const chatInput = document.getElementById("chatInput");
+    const chatSendBtn = document.getElementById("chatSendBtn");
+    const chatToggle = document.getElementById("chatToggle");
+    const chatWindow = document.getElementById("chatWindow");
+    const closeChat = document.getElementById("closeChat");
+
+    // Función limpia para mostrar mensajes en pantalla
+    function addMessage(text, sender) {
+      const msgDiv = document.createElement("div");
+      msgDiv.className = `message ${sender}`;
+      msgDiv.innerText = text;
+      chatMessagesDiv.appendChild(msgDiv);
+      chatMessagesDiv.scrollTop = chatMessagesDiv.scrollHeight;
+    }
+
+    // FUNCIÓN PRINCIPAL ENVIAR (LLAMA A TU SERVIDOR REAL)
+    async function sendMessage() {
+        const userText = chatInput.value.trim();
+        if (!userText) return;
+
+        // Mostrar mensaje del usuario
+        addMessage(userText, "user");
+        chatInput.value = "";
+
+        // Mostrar efecto visual de carga
+        const typingDiv = document.createElement("div");
+        typingDiv.className = "message bot typing";
+        typingDiv.innerText = "✍️ Vitalis está analizando...";
+        chatMessagesDiv.appendChild(typingDiv);
+        chatMessagesDiv.scrollTop = chatMessagesDiv.scrollHeight;
+
+        // Buscar respuesta real de la IA en tu backend
+        const aiReply = await askAI(userText);
+        
+        // Quitar el efecto de escribiendo
+        chatMessagesDiv.removeChild(typingDiv);
+
+        // Mostrar la respuesta inteligente
+        addMessage(aiReply, "bot");
+    }
+
+    // Eventos del Chat flotante
+    chatSendBtn.addEventListener("click", sendMessage);
+    chatInput.addEventListener("keypress", (e) => {
+      if (e.key === "Enter") sendMessage();
+    });
+    
+    chatToggle.addEventListener("click", () => {
+      chatWindow.classList.toggle("open");
+    });
+    closeChat.addEventListener("click", () => {
+      chatWindow.classList.remove("open");
+    });
+
+    // ========== 3. LÓGICA GENERAL DE LA PÁGINA (PARTÍCULAS Y FORMULARIOS) ==========
+    const serviciosOdonto = ["Limpieza dental", "Extracción de muela", "Calza por caries", "Tratamiento de conducto", "Coronas dentales", "Ortodoncia", "Prótesis dentales", "Periodoncia", "Cirugía muelas juicio", "Blanqueamiento"];
+    const serviciosGenerales = ["Consulta medicina general", "Examen médico general", "Examen ingreso laboral", "Certificado médico escolar", "Vacunación", "Control niño sano"];
+    const especialidadesList = ["Cardiología", "Endocrinología", "Gastroenterología", "Neumología", "Neurología", "Dermatología", "Oftalmología", "Otorrinolaringología", "Urología", "Ginecología", "Pediatría", "Psiquiatría", "Psicología", "Reumatología", "Ortopedia", "Nefrología", "Hematología", "Oncología", "Alergología", "Infectología"];
+    const todosServicios = [...serviciosOdonto, ...serviciosGenerales, ...especialidadesList];
+
+    function renderServicios() {
+      const container = document.getElementById("servicesGrid");
+      if (container) {
+        container.innerHTML = todosServicios.map(s => `<div class="service-card" data-servicio="${s}"><i class="fas fa-stethoscope"></i> ${s}</div>`).join("");
+        document.querySelectorAll(".service-card").forEach(card => {
+          card.addEventListener("click", () => {
+            const servicio = card.getAttribute("data-servicio");
+            document.getElementById("citaServicio").value = servicio;
+            document.getElementById("citas").scrollIntoView({ behavior: "smooth" });
+          });
+        });
+      }
+      const specialtiesGrid = document.getElementById("specialtiesGrid");
+      if (specialtiesGrid) specialtiesGrid.innerHTML = especialidadesList.map(esp => `<div class="specialty-card"><i class="fas fa-user-md"></i> ${esp}</div>`).join("");
+      const selectServicio = document.getElementById("citaServicio");
+      if (selectServicio) selectServicio.innerHTML = '<option value="">Selecciona servicio</option>' + todosServicios.map(s => `<option>${s}</option>`).join("");
+    }
+
+    document.getElementById("btnAgendarCita")?.addEventListener("click", () => {
+      let nombre = document.getElementById("citaNombre").value;
+      let servicio = document.getElementById("citaServicio").value;
+      let fecha = document.getElementById("citaFecha").value;
+      if (!nombre || !servicio || !fecha) {
+        document.getElementById("citaMensaje").innerText = "Completa los campos.";
+        return;
+      }
+      document.getElementById("citaMensaje").innerHTML = `✅ Cita agendada para ${servicio} el ${fecha}. Recibirás confirmación.`;
+      addMessage(`Cita agendada manualmente en web: ${servicio} - ${fecha}`, "bot");
+    });
+
+    document.getElementById("btnEnviarPQRS")?.addEventListener("click", () => {
+      let nombre = document.getElementById("pqrsNombre").value;
+      let motivo = document.getElementById("pqrsMotivo").value;
+      if (!nombre || !motivo) {
+        alert("Completa nombre y motivo");
+        return;
+      }
+      alert(`PQRS radicada con éxito, código V-${Math.floor(Math.random() * 10000)}.`);
+      addMessage(`Tu PQRS ha sido radicada correctamente. Te contactaremos pronto.`, "bot");
+    });
+
+    // Partículas de fondo animadas
+    const canvas = document.getElementById("particlesCanvas");
+    const ctx = canvas.getContext("2d");
+    let particles = [];
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+    window.addEventListener("resize", resizeCanvas);
+    resizeCanvas();
+    for (let i = 0; i < 70; i++) particles.push({ x: Math.random() * canvas.width, y: Math.random() * canvas.height, radius: Math.random() * 2 + 1, dx: (Math.random() - 0.5) * 0.3, dy: (Math.random() - 0.5) * 0.15 });
+    
+    function animateParticles() {
+      if (!ctx) return;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = "rgba(80, 180, 220, 0.35)";
+      particles.forEach(p => {
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+        ctx.fill();
+        p.x += p.dx;
+        p.y += p.dy;
+        if (p.x < 0 || p.x > canvas.width) p.dx *= -1;
+        if (p.y < 0 || p.y > canvas.height) p.dy *= -1;
+      });
+      requestAnimationFrame(animateParticles);
+    }
+
+    // Inicializar todo al cargar
+    animateParticles();
+    renderServicios();
+
+    // Auto-abrir chat a los 500ms
+    setTimeout(() => {
+      chatWindow.classList.add("open");
+    }, 500);
+  </script>
