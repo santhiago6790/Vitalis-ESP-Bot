@@ -4,10 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
   <title>Vitalis EPS | Asistente IA de Salud</title>
-
   <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-
   <style>
     * {
       margin: 0;
@@ -21,6 +19,7 @@
       overflow-x: hidden;
     }
 
+    /* Partículas de fondo */
     #particlesCanvas {
       position: fixed;
       top: 0;
@@ -32,391 +31,850 @@
       opacity: 0.4;
     }
 
-    .main-content { position: relative; z-index: 2; }
+    .main-content {
+      position: relative;
+      z-index: 2;
+    }
+
+    /* Estilos generales del sitio */
+    .glass-card, .navbar, section, footer {
+      backdrop-filter: blur(12px);
+      background: rgba(255, 255, 255, 0.3);
+      border-radius: 2rem;
+      border: 1px solid rgba(255, 255, 255, 0.5);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.05);
+    }
+
+    .gradient-text {
+      background: linear-gradient(135deg, #1A6B5E, #2D9CDB);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
 
     .navbar {
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      padding:1rem 2rem;
-      margin:1.5rem;
-      background: rgba(255,255,255,0.3);
-      backdrop-filter: blur(12px);
-      border-radius: 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 2rem;
+      margin: 1.5rem 2rem;
+      border-radius: 3rem;
     }
 
     .logo {
       font-size: 1.8rem;
-      font-weight:700;
-      background: linear-gradient(120deg,#0F4C5C,#2AA9A9);
-      -webkit-background-clip:text;
-      color:transparent;
+      font-weight: 700;
+      background: linear-gradient(120deg, #0F4C5C, #2AA9A9);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
     }
 
     .nav-links {
-      display:flex;
-      gap:1.5rem;
+      display: flex;
+      gap: 2rem;
+      font-weight: 500;
     }
 
     .nav-links a {
-      text-decoration:none;
-      color:#0a2b3e;
+      text-decoration: none;
+      color: #0a2b3e;
+      transition: 0.2s;
     }
 
     .hero {
-      padding:4rem 2rem;
-      text-align:center;
+      padding: 5rem 2rem 4rem;
+      text-align: center;
     }
 
     .hero h1 {
-      font-size:3.5rem;
+      font-size: 4rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
     }
 
-    .gradient-text {
-      background: linear-gradient(135deg,#1A6B5E,#2D9CDB);
-      -webkit-background-clip:text;
-      color:transparent;
+    .hero p {
+      font-size: 1.2rem;
+      max-width: 600px;
+      margin: 0 auto;
+      opacity: 0.8;
     }
 
     section {
-      margin:3rem 2rem;
-      padding:2rem;
-      background: rgba(255,255,255,0.3);
-      backdrop-filter: blur(12px);
+      margin: 4rem 2rem;
+      padding: 2rem;
       border-radius: 2rem;
     }
 
     .section-title {
-      text-align:center;
-      font-size:2rem;
-      margin-bottom:2rem;
+      font-size: 2rem;
+      font-weight: 600;
+      margin-bottom: 2rem;
+      text-align: center;
     }
 
-    .services-grid,
-    .specialties-grid {
-      display:grid;
-      grid-template-columns: repeat(auto-fill,minmax(220px,1fr));
-      gap:1rem;
+    .services-grid, .specialties-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 1.5rem;
     }
 
-    .service-card,
-    .specialty-card {
-      padding:1rem;
-      border-radius:1.5rem;
-      background: rgba(255,255,240,0.4);
-      text-align:center;
-      cursor:pointer;
-      transition:.2s;
+    .service-card, .specialty-card {
+      background: rgba(255, 255, 240, 0.4);
+      padding: 1rem;
+      text-align: center;
+      border-radius: 1.5rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
     }
 
-    .service-card:hover,
-    .specialty-card:hover {
+    .service-card:hover, .specialty-card:hover {
       transform: translateY(-3px);
+      background: rgba(255, 255, 240, 0.6);
+    }
+
+    .cita-form, .pqrs-form {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      max-width: 500px;
+      margin: auto;
     }
 
     input, select, textarea {
-      padding:0.8rem;
-      border:none;
-      border-radius:2rem;
-      background: rgba(255,255,255,0.7);
-      outline:none;
+      background: rgba(255, 255, 255, 0.7);
+      border: none;
+      padding: 0.9rem;
+      border-radius: 2rem;
+      outline: none;
     }
 
     button {
-      cursor:pointer;
-      border:none;
+      cursor: pointer;
+      transition: all 0.2s;
+      border: none;
     }
 
-    /* CHAT */
+    button:hover {
+      transform: translateY(-2px);
+      filter: brightness(1.02);
+    }
+
+    footer {
+      text-align: center;
+      padding: 2rem;
+      margin: 1rem 2rem 2rem;
+    }
+
+    /* ========== CHATBOT FLOTANTE - DISEÑO PREMIUM TIPO ChatGPT ========== */
+    /* CONTENEDOR GENERAL */
+    .chatbot-container {
+      position: fixed;
+      bottom: 0;
+      right: 0;
+      z-index: 999;
+      pointer-events: none;
+    }
+
+    /* BOTÓN FLOTANTE */
     .chat-toggle {
-      position:fixed;
-      bottom:18px;
-      right:18px;
-      width:58px;
-      height:58px;
-      border-radius:50%;
-      background:#1E8F8F;
-      color:white;
-      z-index:1001;
+      position: fixed;
+      bottom: 18px;
+      right: 18px;
+      width: 58px;
+      height: 58px;
+      border-radius: 50%;
+      z-index: 1001;
+      pointer-events: auto;
+      background: linear-gradient(145deg, #1E8F8F, #0f6b6b);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.8rem;
+      color: white;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      border: none;
     }
 
+    .chat-toggle:hover {
+      transform: scale(1.05);
+      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.3);
+    }
+
+    /* VENTANA CHAT */
     .chat-window {
-      position:fixed;
-      bottom:85px;
-      right:12px;
-      width:380px;
-      height:560px;
-      border-radius:24px;
-      display:flex;
-      flex-direction:column;
-      overflow:hidden;
-      background: rgba(5,15,35,0.96);
-      transform:scale(0);
-      opacity:0;
-      transition:.2s;
-      z-index:1000;
+      position: fixed;
+      bottom: 85px;
+      right: 12px;
+      width: 380px;
+      height: 560px;
+      border-radius: 24px;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      background: rgba(5, 15, 35, 0.96);
+      backdrop-filter: blur(20px);
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
+      z-index: 1000;
+      pointer-events: auto;
+      transition: transform 0.25s cubic-bezier(0.2, 0.9, 0.4, 1.1), opacity 0.2s;
+      transform: scale(0);
+      opacity: 0;
+      transform-origin: bottom right;
+      border: 1px solid rgba(255, 255, 255, 0.12);
     }
 
     .chat-window.open {
-      transform:scale(1);
-      opacity:1;
+      transform: scale(1);
+      opacity: 1;
     }
 
+    /* HEADER */
     .chat-header {
-      padding:16px;
-      background: rgba(0,0,0,0.5);
-      color:white;
-      display:flex;
-      justify-content:space-between;
+      padding: 16px 18px;
+      min-height: 64px;
+      background: rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(10px);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      flex-shrink: 0;
     }
 
+    .chat-header h3 {
+      color: white;
+      font-size: 0.95rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .chat-header h3 i {
+      color: #2AA9A9;
+      font-size: 1.1rem;
+    }
+
+    .close-chat {
+      cursor: pointer;
+      color: rgba(255, 255, 255, 0.6);
+      font-size: 1.1rem;
+      transition: 0.2s;
+    }
+
+    .close-chat:hover {
+      color: white;
+    }
+
+    /* ÁREA MENSAJES */
     .chat-body {
-      flex:1;
-      overflow-y:auto;
-      padding:16px;
-      display:flex;
-      flex-direction:column;
-      gap:10px;
+      flex: 1;
+      overflow-y: auto;
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      background: rgba(8, 14, 26, 0.4);
     }
 
+    /* Scroll personalizado */
+    .chat-body::-webkit-scrollbar {
+      width: 4px;
+    }
+
+    .chat-body::-webkit-scrollbar-track {
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 10px;
+    }
+
+    .chat-body::-webkit-scrollbar-thumb {
+      background: rgba(42, 169, 169, 0.5);
+      border-radius: 10px;
+    }
+
+    /* Mensajes */
     .message {
-      max-width:85%;
-      padding:0.7rem 1rem;
-      border-radius:1rem;
-      font-size:0.85rem;
+      max-width: 85%;
+      padding: 0.7rem 1rem;
+      border-radius: 1.3rem;
+      font-size: 0.85rem;
+      line-height: 1.45;
+      animation: fadeSlideUp 0.25s ease;
+      word-wrap: break-word;
     }
 
-    .user {
-      align-self:flex-end;
-      background:#2C7DA0;
-      color:white;
+    .message.user {
+      align-self: flex-end;
+      background: #2C7DA0;
+      color: white;
+      border-bottom-right-radius: 0.25rem;
     }
 
-    .bot {
-      align-self:flex-start;
-      background:rgba(255,255,255,0.1);
-      color:white;
+    .message.bot {
+      align-self: flex-start;
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(4px);
+      color: #f0f9ff;
+      border-bottom-left-radius: 0.25rem;
     }
 
-    .typing {
-      opacity:0.6;
-      font-style:italic;
+    .message.typing {
+      font-style: italic;
+      background: rgba(255, 255, 255, 0.06);
+      color: #aaa;
     }
 
+    .message.urgent {
+      background: rgba(220, 60, 50, 0.85);
+      color: white;
+      border-left: 3px solid #ffaa55;
+    }
+
+    @keyframes fadeSlideUp {
+      from {
+        opacity: 0;
+        transform: translateY(6px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* INPUT */
     .chat-input-container {
-      display:flex;
-      gap:10px;
-      padding:12px;
-      background:#111827;
+      padding: 12px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: rgba(10, 18, 35, 0.98);
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+      flex-shrink: 0;
     }
 
+    /* INPUT TEXTO */
     .chat-input {
-      flex:1;
-      padding:0.8rem;
-      border-radius:2rem;
-      border:none;
-      outline:none;
+      flex: 1;
+      height: 48px;
+      border-radius: 999px;
+      padding: 0 18px;
+      border: none;
+      background: rgba(255, 255, 255, 0.08);
+      color: white;
+      font-size: 0.85rem;
+      outline: none;
+      transition: all 0.2s;
     }
 
+    .chat-input:focus {
+      background: rgba(255, 255, 255, 0.14);
+      border: 1px solid rgba(42, 169, 169, 0.4);
+    }
+
+    .chat-input::placeholder {
+      color: rgba(255, 255, 255, 0.45);
+    }
+
+    /* BOTÓN ENVIAR */
     .send-btn {
-      width:45px;
-      height:45px;
-      border-radius:50%;
-      background:#1E8F8F;
-      color:white;
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #1E8F8F, #0f6b6b);
+      border: none;
+      color: white;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+      flex-shrink: 0;
     }
 
-    @media(max-width:768px){
+    .send-btn:hover {
+      transform: scale(1.04);
+      background: linear-gradient(135deg, #2aa9a9, #148080);
+    }
+
+    /* RESPONSIVE MÓVIL */
+    @media (max-width: 768px) {
       .chat-window {
-        width:90%;
-        height:520px;
+        width: calc(100vw - 32px);
+        max-width: 360px;
+        height: 520px;
+        right: 12px;
+        bottom: 80px;
+      }
+
+      .navbar {
+        flex-direction: column;
+        gap: 1rem;
+        margin: 1rem;
+      }
+
+      .nav-links {
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 1rem;
+      }
+
+      section {
+        margin: 2rem 1rem;
+        padding: 1.5rem;
+      }
+
+      .hero h1 {
+        font-size: 2.5rem;
+      }
+
+      .services-grid, .specialties-grid {
+        grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+        gap: 1rem;
+      }
+
+      .chat-toggle {
+        bottom: 16px;
+        right: 16px;
+        width: 54px;
+        height: 54px;
+        font-size: 1.6rem;
+      }
+
+      .chat-body {
+        padding: 14px;
+        gap: 10px;
+      }
+
+      .message {
+        max-width: 90%;
+        padding: 0.6rem 0.9rem;
+        font-size: 0.8rem;
+      }
+    }
+
+    /* Ajustes para pantallas muy pequeñas */
+    @media (max-width: 480px) {
+      .chat-window {
+        width: calc(100vw - 24px);
+        max-width: 320px;
+        height: 500px;
+        right: 10px;
+        bottom: 76px;
+      }
+
+      .chat-input {
+        height: 44px;
+        padding: 0 14px;
+      }
+
+      .send-btn {
+        width: 44px;
+        height: 44px;
       }
     }
   </style>
 </head>
-
 <body>
-
-<canvas id="particlesCanvas"></canvas>
-
-<div class="main-content">
-
-  <nav class="navbar">
-    <div class="logo">VITALIS EPS</div>
-    <div class="nav-links">
-      <a href="#inicio">Inicio</a>
-      <a href="#servicios">Servicios</a>
-      <a href="#especialidades">Especialidades</a>
-      <a href="#citas">Citas</a>
-      <a href="#pqrs">PQRS</a>
+  <canvas id="particlesCanvas"></canvas>
+  <div class="main-content">
+    <nav class="navbar">
+      <div class="logo">✦ VITALIS EPS</div>
+      <div class="nav-links">
+        <a href="#inicio">Inicio</a>
+        <a href="#servicios">Servicios</a>
+        <a href="#especialidades">Especialidades</a>
+        <a href="#citas">Agendar cita</a>
+        <a href="#pqrs">PQRS</a>
+        <a href="#contacto">Contacto</a>
+      </div>
+    </nav>
+    <div id="inicio" class="hero">
+      <h1>Salud <span class="gradient-text">Inteligente</span> al instante</h1>
+      <p>Vitalis EPS: IA conversacional avanzada, autorizaciones ágiles y atención médica de vanguardia.</p>
     </div>
-  </nav>
-
-  <div class="hero" id="inicio">
-    <h1>Salud <span class="gradient-text">Inteligente</span></h1>
-    <p>IA médica + atención digital + gestión inteligente</p>
+    <section style="text-align:center;">
+      <div style="display:flex; flex-wrap:wrap; gap:2rem; justify-content:center;">
+        <div style="flex:1; min-width:200px;"><i class="fas fa-robot" style="font-size:3rem; color:#1E8F8F;"></i><h3>IA Médica</h3><p>Chatbot con memoria y flujo natural.</p></div>
+        <div style="flex:1; min-width:200px;"><i class="fas fa-calendar-check" style="font-size:3rem; color:#2D9CDB;"></i><h3>Citas Ágiles</h3><p>Agenda en segundos sin perder contexto.</p></div>
+        <div style="flex:1; min-width:200px;"><i class="fas fa-prescription-bottle" style="font-size:3rem; color:#48BB78;"></i><h3>Medicamentos</h3><p>Gestión integral desde el chat.</p></div>
+      </div>
+    </section>
+    <section id="servicios"><h2 class="section-title">Servicios médicos</h2><div class="services-grid" id="servicesGrid"></div></section>
+    <section id="especialidades"><h2 class="section-title">Especialidades médicas</h2><div class="specialties-grid" id="specialtiesGrid"></div></section>
+    <section id="citas"><h2 class="section-title">📅 Agendar cita médica</h2><div class="cita-form"><input type="text" id="citaNombre" placeholder="Nombre completo"><input type="text" id="citaDoc" placeholder="Documento"><select id="citaServicio"><option value="">Selecciona servicio</option></select><input type="date" id="citaFecha"><input type="text" id="citaCiudad" placeholder="Ciudad"><button id="btnAgendarCita" style="background:#1E8F8F; color:white; padding:0.8rem; border-radius:3rem;">Agendar cita</button><div id="citaMensaje"></div></div></section>
+    <section id="pqrs"><h2 class="section-title">PQRS — Peticiones, Quejas, Reclamos</h2><div class="pqrs-form"><input type="text" id="pqrsNombre" placeholder="Nombre"><textarea id="pqrsMotivo" rows="3" placeholder="Cuéntanos tu caso..."></textarea><button id="btnEnviarPQRS" style="background:#4a6e8c; color:white; padding:0.8rem; border-radius:3rem;">Radicar PQRS</button></div></section>
+    <section id="contacto"><h2 class="section-title">Contacto oficial</h2><p style="text-align:center;">📞 Línea nacional: 01 8000 123 456 | ✉️ hola@vitaliseps.co | 💬 Chat disponible 24/7</p></section>
+    <footer><p>© 2025 Vitalis EPS — Transformación digital en salud, inteligencia artificial al servicio del bienestar.</p></footer>
   </div>
 
-  <section id="servicios">
-    <h2 class="section-title">Servicios</h2>
-    <div class="services-grid" id="servicesGrid"></div>
-  </section>
-
-  <section id="especialidades">
-    <h2 class="section-title">Especialidades</h2>
-    <div class="specialties-grid" id="specialtiesGrid"></div>
-  </section>
-
-  <section id="citas">
-    <h2 class="section-title">Agendar cita</h2>
-    <input id="citaNombre" placeholder="Nombre">
-    <input id="citaDoc" placeholder="Documento">
-    <select id="citaServicio"></select>
-    <input type="date" id="citaFecha">
-    <button id="btnCita">Agendar</button>
-    <div id="citaMsg"></div>
-  </section>
-
-  <section id="pqrs">
-    <h2 class="section-title">PQRS</h2>
-    <input id="pqrsNombre" placeholder="Nombre">
-    <textarea id="pqrsMotivo"></textarea>
-    <button id="btnPQRS">Enviar</button>
-  </section>
-
-</div>
-
-<!-- CHAT -->
-<button class="chat-toggle" id="chatToggle">💬</button>
-
-<div class="chat-window" id="chatWindow">
-
-  <div class="chat-header">
-    <span>Vitalis AI</span>
-    <span id="closeChat">✖</span>
+  <!-- CHATBOT FLOTANTE INDEPENDIENTE -->
+  <div class="chatbot-container">
+    <button class="chat-toggle" id="chatToggle">
+      <i class="fas fa-comment-dots"></i>
+    </button>
+    <div class="chat-window" id="chatWindow">
+      <div class="chat-header">
+        <h3><i class="fas fa-brain"></i> Vitalis AI · Asistente médico</h3>
+        <i class="fas fa-times close-chat" id="closeChat"></i>
+      </div>
+      <div class="chat-body" id="chatMessages">
+        <div class="message bot">✨ Hola, soy Vitalis, tu asistente de salud con IA. Cuéntame, ¿cómo te sientes hoy o en qué puedo ayudarte?</div>
+      </div>
+      <div class="chat-input-container">
+        <input type="text" class="chat-input" id="chatInput" placeholder="Escribe de forma natural..." autocomplete="off">
+        <button class="send-btn" id="chatSendBtn"><i class="fas fa-paper-plane"></i></button>
+      </div>
+    </div>
   </div>
 
-  <div class="chat-body" id="chatMessages">
-    <div class="message bot">Hola 👋 soy Vitalis IA</div>
-  </div>
+  <script>
+    // ==================== SISTEMA DE IA MÉDICA CON MEMORIA Y PRIORIDAD DE URGENCIAS ====================
+    let userSession = {
+      nombre: null,
+      documento: null,
+      contextoActivo: null,
+      pasoActual: null,
+      sintomasRegistrados: [],
+      datosTemp: {},
+      esperandoConfirmacion: false,
+      ultimoMensajeUsuario: ""
+    };
 
-  <div class="chat-input-container">
-    <input class="chat-input" id="chatInput">
-    <button class="send-btn" id="sendBtn">➤</button>
-  </div>
+    // Detección de urgencias (ALTA PRIORIDAD)
+    function detectarUrgencia(mensaje) {
+      const m = mensaje.toLowerCase();
+      const urgencias = [
+        'dolor de pecho', 'pecho', 'dolor en el pecho', 'opresión en el pecho',
+        'dificultad para respirar', 'ahogo', 'no puedo respirar', 'falta de aire',
+        'sangrado', 'sangre', 'hemorragia', 'sangrando',
+        'desmayo', 'desmayé', 'perdí el conocimiento', 'desvanecimiento', 'desmayado',
+        'convulsión', 'convulsiones', 'ataque', 'epilepsia',
+        'fiebre extrema', 'fiebre muy alta', '40 grados', 'fiebre 40',
+        'pérdida de conciencia', 'inconsciente', 'no responde',
+        'accidente', 'golpe fuerte', 'trauma'
+      ];
+      for (let urg of urgencias) {
+        if (m.includes(urg)) return true;
+      }
+      return false;
+    }
 
-</div>
+    // Procesar intención principal (flujo continuo sin reinicios)
+    function procesarIntencion(mensaje) {
+      const m = mensaje.toLowerCase();
+      // Si hay contexto activo, mantenerlo
+      if (userSession.contextoActivo === 'sintomas') return 'sintomas';
+      if (userSession.contextoActivo === 'citas') return 'citas';
+      if (userSession.contextoActivo === 'medicamentos') return 'medicamentos';
+      if (userSession.contextoActivo === 'autorizaciones') return 'autorizaciones';
+      if (userSession.contextoActivo === 'pqrs') return 'pqrs';
+      if (userSession.contextoActivo === 'afiliacion') return 'afiliacion';
 
-<script>
-const API_URL = "http://localhost:3000/chat";
+      // Detectar intenciones (prioridad: urgencia > síntomas > otras)
+      if (detectarUrgencia(m)) return 'urgencia';
+      if (m.match(/gripa|fiebre|tos|dolor|dolor de cabeza|cansancio|garganta|respirar|mareo|nauseas|vomito|diarrea|escalofrio|moco|flema|estornudo|congestion|ahogo|pecho|presion|debilidad|malestar/)) return 'sintomas';
+      if (m.match(/cita|agendar|consulta|especialista|cardiolog|ginecolog|pediatra|medicina general|odontolog|oftalmologo/)) return 'citas';
+      if (m.match(/medicamento|fórmula|pastilla|jarabe|inyeccion|drogueria|farmacia|MIPRES|entregar medicina/)) return 'medicamentos';
+      if (m.match(/autorizacion|procedimiento|orden medica|cirugia|autorizar|estudio|examen|radiolo|tomografia/)) return 'autorizaciones';
+      if (m.match(/pqrs|queja|reclamo|peticion|demora|mal servicio|inconveniente|no me atendieron/)) return 'pqrs';
+      if (m.match(/afiliacion|eps|titular|beneficiario|carnet|certificado|cambiar eps|traslado|aportes/)) return 'afiliacion';
+      return 'general';
+    }
 
-/* CHAT */
-const chatWindow = document.getElementById("chatWindow");
-const chatToggle = document.getElementById("chatToggle");
-const closeChat = document.getElementById("closeChat");
-const chatInput = document.getElementById("chatInput");
-const chatMessages = document.getElementById("chatMessages");
-const sendBtn = document.getElementById("sendBtn");
+    // Respuesta principal con flujo médico humano
+    function responderNaturalmente(mensajeUsuario) {
+      // Prioridad máxima: URGENCIA
+      if (detectarUrgencia(mensajeUsuario)) {
+        userSession.contextoActivo = null;
+        userSession.pasoActual = null;
+        return "🚨🚨 ATENCIÓN PRIORITARIA 🚨🚨\n\nLos síntomas que describes pueden ser una emergencia médica. Por favor, ACUDE INMEDIATAMENTE A URGENCIAS o llama al 123 (línea de emergencias en Colombia). No esperes ni intentes automedicarte. ¿Necesitas que te indique la IPS más cercana? Responde 'sí' para ayudarte.";
+      }
 
-function addMessage(text, type){
-  const div = document.createElement("div");
-  div.className = "message " + type;
-  div.innerText = text;
-  chatMessages.appendChild(div);
-  chatMessages.scrollTop = chatMessages.scrollHeight;
-}
+      const intencion = procesarIntencion(mensajeUsuario);
+      const msg = mensajeUsuario.toLowerCase();
 
-async function askAI(msg){
-  try {
-    const res = await fetch(API_URL,{
-      method:"POST",
-      headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({message:msg})
+      // FLUJO SÍNTOMAS - CLÍNICO, EMPÁTICO Y CONTINUO
+      if (intencion === 'sintomas' || userSession.contextoActivo === 'sintomas') {
+        if (userSession.contextoActivo !== 'sintomas') {
+          userSession.contextoActivo = 'sintomas';
+          userSession.sintomasRegistrados = [];
+          userSession.pasoActual = 'recogiendo_sintomas';
+          return "🤒 Lamento que no te sientas bien. Cuéntame con más detalle: ¿qué síntomas específicos tienes y desde cuándo? Por ejemplo: fiebre, tos, dolor de cabeza, dolor de garganta, cansancio...";
+        }
+
+        // Extraer nuevos síntomas
+        const sintomasDetectados = [];
+        if (msg.includes('fiebre')) sintomasDetectados.push('fiebre');
+        if (msg.includes('tos')) sintomasDetectados.push('tos');
+        if (msg.includes('garganta')) sintomasDetectados.push('dolor de garganta');
+        if (msg.includes('cabeza')) sintomasDetectados.push('dolor de cabeza');
+        if (msg.includes('cansancio') || msg.includes('fatiga')) sintomasDetectados.push('cansancio');
+        if (msg.includes('respirar') || msg.includes('ahogo')) sintomasDetectados.push('dificultad respiratoria');
+        if (msg.includes('nauseas')) sintomasDetectados.push('náuseas');
+        if (msg.includes('diarrea')) sintomasDetectados.push('diarrea');
+        if (msg.includes('musculo') || msg.includes('cuerpo')) sintomasDetectados.push('dolor muscular');
+        
+        for (let s of sintomasDetectados) {
+          if (!userSession.sintomasRegistrados.includes(s)) userSession.sintomasRegistrados.push(s);
+        }
+
+        // Flujo clínico natural
+        if (userSession.pasoActual === 'recogiendo_sintomas' && !userSession.datosTemp.tiempo_sintomas) {
+          if (msg.match(/desde hace|días|horas|semana|ayer|hoy|antier|3 días|2 días/)) {
+            userSession.datosTemp.tiempo_sintomas = msg;
+            userSession.pasoActual = 'preguntar_fiebre';
+            return "Entiendo. ¿Has tenido fiebre o temperatura elevada? Si es así, ¿puedes decirme aproximadamente cuánto?";
+          } else {
+            return "Gracias por compartir. ¿Desde cuándo presentas estos síntomas? (Ej: desde ayer, hace 3 días)";
+          }
+        }
+
+        if (userSession.pasoActual === 'preguntar_fiebre') {
+          userSession.datosTemp.fiebre = msg;
+          userSession.pasoActual = 'preguntar_respiratorio';
+          if (msg.includes('no') || msg.includes('sin fiebre')) {
+            return "Perfecto. ¿Has tenido dificultad para respirar, sensación de ahogo o silbidos en el pecho?";
+          } else {
+            return "Importante mantener hidratación y reposo. ¿Has tenido dificultad para respirar, sensación de ahogo o silbidos en el pecho?";
+          }
+        }
+
+        if (userSession.pasoActual === 'preguntar_respiratorio') {
+          userSession.datosTemp.respiratorio = msg;
+          userSession.pasoActual = 'evaluar_urgencia';
+          if (msg.includes('sí') || msg.includes('dificultad') || msg.includes('ahogo')) {
+            return "⚠️ La dificultad respiratoria es una señal de alerta importante. Por tu seguridad, te recomiendo ACUDIR A URGENCIAS. ¿Necesitas que te ayude con la ubicación de la IPS más cercana?";
+          } else {
+            let recomendacion = "Basado en tus síntomas: ";
+            if (userSession.sintomasRegistrados.includes('fiebre') && userSession.sintomasRegistrados.includes('tos')) {
+              recomendacion += "podría ser una infección respiratoria viral. Te recomiendo: descanso, hidratación abundante y acetaminofén si no eres alérgico. ";
+            } else if (userSession.sintomasRegistrados.includes('dolor de cabeza')) {
+              recomendacion += "podría ser tensión o migraña. Descansa en un lugar oscuro, mantente hidratado y evita pantallas brillantes. ";
+            } else {
+              recomendacion += "sugiero reposo e hidratación. ";
+            }
+            recomendacion += "Si los síntomas empeoran, la fiebre supera 39°C o presentas dificultad respiratoria, acude a urgencias. ¿Deseas que te ayude a agendar una cita de medicina general para seguimiento?";
+            userSession.pasoActual = 'ofrecer_cita';
+            return recomendacion;
+          }
+        }
+
+        if (userSession.pasoActual === 'ofrecer_cita') {
+          if (msg.includes('sí') || msg.includes('si') || msg.includes('agendar')) {
+            userSession.contextoActivo = 'citas';
+            userSession.pasoActual = null;
+            userSession.datosTemp = {};
+            return "Perfecto, puedo ayudarte a agendar una cita de medicina general. ¿En qué ciudad te encuentras?";
+          } else {
+            userSession.contextoActivo = null;
+            userSession.pasoActual = null;
+            return "Estaré aquí para lo que necesites. Recuerda que si empeoras, acude a urgencias. ¿Hay algo más en lo que pueda ayudarte?";
+          }
+        }
+        return "¿Podrías contarme más sobre cómo te sientes? Cada detalle ayuda a darte mejor orientación médica.";
+      }
+
+      // FLUJO CITAS (natural y conversacional)
+      if (intencion === 'citas' || userSession.contextoActivo === 'citas') {
+        if (userSession.contextoActivo !== 'citas') {
+          userSession.contextoActivo = 'citas';
+          userSession.datosTemp = {};
+          return "📋 Para agendar tu cita, dime ¿qué especialidad necesitas? (Medicina general, Odontología, Cardiología, Pediatría, Ginecología, etc.)";
+        }
+        if (!userSession.datosTemp.especialidad) {
+          userSession.datosTemp.especialidad = mensajeUsuario;
+          return "¿En qué ciudad o municipio te encuentras? Así busco disponibilidad para ti.";
+        }
+        if (!userSession.datosTemp.ciudad) {
+          userSession.datosTemp.ciudad = mensajeUsuario;
+          return "Perfecto. ¿Qué día prefieres para tu cita? (Ej: lunes, miércoles o una fecha específica)";
+        }
+        if (!userSession.datosTemp.fecha) {
+          userSession.datosTemp.fecha = mensajeUsuario;
+          return "¿En qué horario te funciona mejor: mañana (8am-12pm), tarde (2pm-6pm) o noche (6pm-9pm)?";
+        }
+        if (!userSession.datosTemp.horario) {
+          userSession.datosTemp.horario = mensajeUsuario;
+          let resumen = `✅ Confirmo: ${userSession.datosTemp.especialidad} en ${userSession.datosTemp.ciudad}, para ${userSession.datosTemp.fecha} en horario ${userSession.datosTemp.horario}. ¿Los datos son correctos?`;
+          userSession.datosTemp.esperandoConfirmacion = true;
+          return resumen;
+        }
+        if (userSession.datosTemp.esperandoConfirmacion && (msg.includes('sí') || msg.includes('si') || msg.includes('correcto') || msg.includes('confirmo'))) {
+          userSession.contextoActivo = null;
+          userSession.datosTemp = {};
+          return "¡Cita agendada con éxito! Te enviaremos recordatorio por SMS y correo. ¿Necesitas algo más?";
+        }
+        return "Entiendo, dime si quieres modificar algún dato o confirmamos la cita como te la mencioné.";
+      }
+
+      // OTROS FLUJOS CON EMPATÍA
+      if (intencion === 'medicamentos') {
+        userSession.contextoActivo = 'medicamentos';
+        return "💊 Para ayudarte con medicamentos: ¿Tienes fórmula médica vigente? ¿Es un medicamento de control especial o fórmula MIPRES? Cuéntame qué necesitas específicamente.";
+      }
+      if (intencion === 'autorizaciones') {
+        userSession.contextoActivo = 'autorizaciones';
+        return "📄 Para gestionar tu autorización de manera ágil: ¿qué procedimiento, estudio o cirugía necesitas autorizar? ¿Ya cuentas con orden médica del especialista?";
+      }
+      if (intencion === 'pqrs') {
+        userSession.contextoActivo = 'pqrs';
+        return "📝 Lamento cualquier inconveniente que hayas tenido. Por favor, cuéntame con detalle qué ocurrió, cuándo y cómo te afectó. Puedo radicar tu PQRS directamente desde aquí y darte un número de seguimiento oficial.";
+      }
+      if (intencion === 'afiliacion') {
+        userSession.contextoActivo = 'afiliacion';
+        return "🏥 Sobre tu afiliación: ¿Eres titular o beneficiario? ¿Necesitas consultar tu estado, actualizar datos personales, obtener un certificado o información sobre traslado de EPS?";
+      }
+
+      // RESPUESTAS GENERALES HUMANAS
+      if (msg.includes('gracias')) {
+        userSession.contextoActivo = null;
+        userSession.pasoActual = null;
+        return "¡Es un placer ayudarte! Siempre estaré aquí para ti. Recuerda que Vitalis EPS cuida de tu salud. ¿Necesitas algo más?";
+      }
+      if (msg.includes('hola') || msg.includes('buenas') || (msg.length < 25 && !msg.includes('que'))) {
+        return "👋 ¡Hola! Soy Vitalis, tu asistente de salud con inteligencia artificial. Puedes contarme cómo te sientes, pedir ayuda con citas, medicamentos, autorizaciones o PQRS. ¿Qué necesitas hoy?";
+      }
+      
+      return "Entiendo tu mensaje. Como asistente médico de Vitalis EPS, puedo ayudarte con síntomas, agendar citas, gestionar medicamentos, autorizaciones médicas, PQRS y consultas de afiliación. ¿Podrías darme más detalles sobre lo que necesitas?";
+    }
+
+    // ========== UI CHAT ==========
+    const chatMessagesDiv = document.getElementById("chatMessages");
+    const chatInput = document.getElementById("chatInput");
+    const chatSendBtn = document.getElementById("chatSendBtn");
+    const chatToggle = document.getElementById("chatToggle");
+    const chatWindow = document.getElementById("chatWindow");
+    const closeChat = document.getElementById("closeChat");
+
+    function addMessage(text, sender, isUrgent = false) {
+      const msgDiv = document.createElement("div");
+      msgDiv.className = `message ${sender}`;
+      if (isUrgent && sender === 'bot') msgDiv.classList.add('urgent');
+      msgDiv.innerText = text;
+      chatMessagesDiv.appendChild(msgDiv);
+      chatMessagesDiv.scrollTop = chatMessagesDiv.scrollHeight;
+    }
+
+    async function sendMessage() {
+      const userText = chatInput.value.trim();
+      if (!userText) return;
+      addMessage(userText, "user");
+      chatInput.value = "";
+
+      const typingDiv = document.createElement("div");
+      typingDiv.className = "message bot typing";
+      typingDiv.innerText = "✍️ Vitalis está analizando...";
+      chatMessagesDiv.appendChild(typingDiv);
+      chatMessagesDiv.scrollTop = chatMessagesDiv.scrollHeight;
+
+      setTimeout(() => {
+        chatMessagesDiv.removeChild(typingDiv);
+        const respuesta = responderNaturalmente(userText);
+        const isUrgent = detectarUrgencia(userText);
+        addMessage(respuesta, "bot", isUrgent);
+        userSession.ultimoMensajeUsuario = userText;
+      }, 650);
+    }
+
+    chatSendBtn.addEventListener("click", sendMessage);
+    chatInput.addEventListener("keypress", (e) => {
+      if (e.key === "Enter") sendMessage();
+    });
+    chatToggle.addEventListener("click", () => {
+      chatWindow.classList.toggle("open");
+    });
+    closeChat.addEventListener("click", () => {
+      chatWindow.classList.remove("open");
     });
 
-    const data = await res.json().catch(()=>({}));
-    return data.reply || "Sin respuesta del servidor";
-  } catch(e){
-    return "Error de conexión";
-  }
-}
+    // Servicios UI
+    const serviciosOdonto = ["Limpieza dental", "Extracción de muela", "Calza por caries", "Tratamiento de conducto", "Coronas dentales", "Ortodoncia", "Prótesis dentales", "Periodoncia", "Cirugía muelas juicio", "Blanqueamiento"];
+    const serviciosGenerales = ["Consulta medicina general", "Examen médico general", "Examen ingreso laboral", "Certificado médico escolar", "Vacunación", "Control niño sano"];
+    const especialidadesList = ["Cardiología", "Endocrinología", "Gastroenterología", "Neumología", "Neurología", "Dermatología", "Oftalmología", "Otorrinolaringología", "Urología", "Ginecología", "Pediatría", "Psiquiatría", "Psicología", "Reumatología", "Ortopedia", "Nefrología", "Hematología", "Oncología", "Alergología", "Infectología"];
+    const todosServicios = [...serviciosOdonto, ...serviciosGenerales, ...especialidadesList];
 
-async function sendMessage(){
-  const text = chatInput.value.trim();
-  if(!text) return;
+    function renderServicios() {
+      const container = document.getElementById("servicesGrid");
+      if (container) {
+        container.innerHTML = todosServicios.map(s => `<div class="service-card" data-servicio="${s}"><i class="fas fa-stethoscope"></i> ${s}</div>`).join("");
+        document.querySelectorAll(".service-card").forEach(card => {
+          card.addEventListener("click", () => {
+            const servicio = card.getAttribute("data-servicio");
+            document.getElementById("citaServicio").value = servicio;
+            document.getElementById("citas").scrollIntoView({ behavior: "smooth" });
+            addMessage(`Quiero agendar ${servicio}`, "user");
+            addMessage(`Perfecto, puedo ayudarte con la cita de ${servicio}. ¿En qué ciudad te encuentras?`, "bot");
+            userSession.contextoActivo = 'citas';
+            userSession.datosTemp = { especialidad: servicio };
+          });
+        });
+      }
+      const specialtiesGrid = document.getElementById("specialtiesGrid");
+      if (specialtiesGrid) specialtiesGrid.innerHTML = especialidadesList.map(esp => `<div class="specialty-card"><i class="fas fa-user-md"></i> ${esp}</div>`).join("");
+      const selectServicio = document.getElementById("citaServicio");
+      if (selectServicio) selectServicio.innerHTML = '<option value="">Selecciona servicio</option>' + todosServicios.map(s => `<option>${s}</option>`).join("");
+    }
 
-  addMessage(text,"user");
-  chatInput.value="";
+    document.getElementById("btnAgendarCita")?.addEventListener("click", () => {
+      let nombre = document.getElementById("citaNombre").value;
+      let servicio = document.getElementById("citaServicio").value;
+      let fecha = document.getElementById("citaFecha").value;
+      if (!nombre || !servicio || !fecha) {
+        document.getElementById("citaMensaje").innerText = "Completa los campos.";
+        return;
+      }
+      document.getElementById("citaMensaje").innerHTML = `✅ Cita agendada para ${servicio} el ${fecha}. Recibirás confirmación.`;
+      addMessage(`Cita agendada: ${servicio} - ${fecha}`, "bot");
+    });
 
-  const typing = document.createElement("div");
-  typing.className="message bot typing";
-  typing.innerText="Escribiendo...";
-  chatMessages.appendChild(typing);
+    document.getElementById("btnEnviarPQRS")?.addEventListener("click", () => {
+      let nombre = document.getElementById("pqrsNombre").value;
+      let motivo = document.getElementById("pqrsMotivo").value;
+      if (!nombre || !motivo) {
+        alert("Completa nombre y motivo");
+        return;
+      }
+      alert(`PQRS radicada con éxito, código V-${Math.floor(Math.random() * 10000)}.`);
+      addMessage(`Tu PQRS ha sido radicada correctamente. Te contactaremos en máximo 48h.`, "bot");
+    });
 
-  const reply = await askAI(text);
-
-  typing.remove();
-  addMessage(reply,"bot");
-}
-
-sendBtn.onclick = sendMessage;
-
-chatInput.addEventListener("keydown",(e)=>{
-  if(e.key==="Enter") sendMessage();
-});
-
-chatToggle.onclick = ()=> chatWindow.classList.toggle("open");
-closeChat.onclick = ()=> chatWindow.classList.remove("open");
-
-/* SERVICIOS */
-const servicios = ["Consulta","Odontología","Pediatría","Cardiología","Dermatología"];
-const especialidades = ["Cardio","Neuro","Dermato","Pediatría"];
-
-const grid = document.getElementById("servicesGrid");
-grid.innerHTML = servicios.map(s=>`<div class="service-card">${s}</div>`).join("");
-
-document.getElementById("specialtiesGrid").innerHTML =
-especialidades.map(s=>`<div class="specialty-card">${s}</div>`).join("");
-
-document.getElementById("citaServicio").innerHTML =
-servicios.map(s=>`<option>${s}</option>`).join("");
-
-document.getElementById("btnCita").onclick = ()=>{
-  addMessage("Cita agendada ✔","bot");
-};
-
-document.getElementById("btnPQRS").onclick = ()=>{
-  addMessage("PQRS enviada ✔","bot");
-};
-
-/* PARTICULAS SIMPLE */
-const canvas=document.getElementById("particlesCanvas");
-const ctx=canvas.getContext("2d");
-canvas.width=window.innerWidth;
-canvas.height=window.innerHeight;
-
-let p=[];
-for(let i=0;i<50;i++){
-  p.push({x:Math.random()*canvas.width,y:Math.random()*canvas.height});
-}
-
-function draw(){
-  ctx.clearRect(0,0,canvas.width,canvas.height);
-  ctx.fillStyle="rgba(80,180,220,0.3)";
-  p.forEach(pt=>{
-    ctx.beginPath();
-    ctx.arc(pt.x,pt.y,2,0,Math.PI*2);
-    ctx.fill();
-    pt.x+=0.3;
-    pt.y+=0.2;
-    if(pt.x>canvas.width) pt.x=0;
-    if(pt.y>canvas.height) pt.y=0;
-  });
-  requestAnimationFrame(draw);
-}
-draw();
-
-</script>
-
+    // Partículas dinámicas
+    const canvas = document.getElementById("particlesCanvas");
+    const ctx = canvas.getContext("2d");
+    let particles = [];
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+    window.addEventListener("resize", resizeCanvas);
+    resizeCanvas();
+    for (let i = 0; i < 70; i++) particles.push({ x: Math.random() * canvas.width, y: Math.random() * canvas.height, radius: Math.random() * 2 + 1, dx: (Math.random() - 0.5) * 0.3, dy: (Math.random() - 0.5) * 0.15 });
+    function animateParticles() {
+      if (!ctx) return;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = "rgba(80, 180, 220, 0.35)";
+      particles.forEach(p => {
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+        ctx.fill();
+        p.x += p.dx;
+        p.y += p.dy;
+        if (p.x < 0 || p.x > canvas.width) p.dx *= -1;
+        if (p.y < 0 || p.y > canvas.height) p.dy *= -1;
+      });
+      requestAnimationFrame(animateParticles);
+    }
+    animateParticles();
+    renderServicios();
+    
+    // Auto-abrir chat ligeramente para mostrar disponibilidad
+    setTimeout(() => {
+      chatWindow.classList.add("open");
+    }, 500);
+  </script>
 </body>
 </html>
