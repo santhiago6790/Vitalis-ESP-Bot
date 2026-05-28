@@ -9,7 +9,7 @@ dotenv.config();
 
 const app = express();
 
-// ===== PATH PARA RENDER =====
+// ===== PATH RENDER =====
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -28,54 +28,62 @@ const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
+// 🔥 CHECK CRÍTICO (Render logs)
+console.log("API KEY EXISTE:", !!process.env.OPENAI_API_KEY);
+
 // ===== MEMORIA CHAT =====
 let messages = [
   {
     role: "system",
     content:
-      "Eres Vitalis, un asistente médico virtual claro, humano y directo. Respondes síntomas de forma sencilla y empática."
+      "Eres Vitalis, un asistente médico virtual claro, humano y directo. Respondes de forma simple y empática."
   }
 ];
 
-// ===== CHAT ROUTE =====
+// ===== CHAT =====
 app.post("/chat", async (req, res) => {
   try {
     const userMessage = req.body.message;
 
     if (!userMessage) {
-      return res.status(400).json({ error: "Mensaje vacío" });
+      return res.status(400).json({ reply: "Mensaje vacío" });
     }
 
-    // Guardar mensaje usuario
+    // guardar usuario
     messages.push({
       role: "user",
       content: userMessage,
     });
 
-    // Llamada a OpenAI
+    // llamada OpenAI
     const completion = await openai.chat.completions.create({
       model: "gpt-4o",
       messages,
     });
 
-    // Respuesta segura (evita undefined)
-    const reply =
-      completion?.choices?.[0]?.message?.content ||
-      "No pude generar respuesta en este momento.";
+    console.log("OPENAI RAW:", JSON.stringify(completion, null, 2));
 
-    // Guardar respuesta bot
+    // respuesta segura (ANTI undefined)
+    const reply = completion?.choices?.[0]?.message?.content;
+
+    const finalReply =
+      reply && reply.trim().length > 0
+        ? reply
+        : "No pude generar respuesta en este momento.";
+
+    // guardar respuesta
     messages.push({
       role: "assistant",
-      content: reply,
+      content: finalReply,
     });
 
-    res.json({ reply });
+    res.json({ reply: finalReply });
 
   } catch (error) {
-    console.error("ERROR OPENAI:", error);
+    console.error("ERROR BACKEND:", error);
 
     res.status(500).json({
-      error: "Error en el servidor o OpenAI",
+      reply: "Error en servidor o en OpenAI",
     });
   }
 });
