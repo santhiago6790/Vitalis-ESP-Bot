@@ -1,17 +1,18 @@
 import express from "express";
 import cors from "cors";
-import dotenv from "dotenv";
 import OpenAI from "openai";
-
-dotenv.config();
 
 const app = express();
 
 app.use(cors());
 app.use(express.json());
 
+app.get("/", (req, res) => {
+  res.send("Vitalis API funcionando 🚀");
+});
+
 const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
+  apiKey: process.env.OPENAI_API_KEY?.trim(),
 });
 
 // Memoria del chat con las instrucciones de médico empático corregidas
