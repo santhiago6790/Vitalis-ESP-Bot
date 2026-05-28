@@ -6,27 +6,29 @@ import OpenAI from "openai";
 dotenv.config();
 
 const app = express();
-
 app.use(cors());
 app.use(express.json());
 
-// 🔥 ESTO es lo que evita "Cannot GET /"
+// 🔥 IMPORTANTE: Render health check
 app.get("/", (req, res) => {
   res.send("Vitalis API funcionando 🚀");
 });
 
+// 🔑 OpenAI
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
-let historialMensajes = [
+// 🧠 memoria simple (chat tipo ChatGPT)
+let messages = [
   {
     role: "system",
     content:
-      "Eres Vitalis, un médico experto y empático. Respondes claro, humano y directo."
+      "Eres Vitalis, un asistente médico virtual claro, humano y directo. Ayudas con síntomas y salud sin ser robótico."
   }
 ];
 
+// 💬 CHAT ROUTE
 app.post("/chat", async (req, res) => {
   try {
     const userMessage = req.body.message;
@@ -35,34 +37,34 @@ app.post("/chat", async (req, res) => {
       return res.status(400).json({ error: "Mensaje vacío" });
     }
 
-    historialMensajes.push({
+    messages.push({
       role: "user",
       content: userMessage,
     });
 
     const completion = await openai.chat.completions.create({
       model: "gpt-4o-mini",
-      messages: historialMensajes,
+      messages,
     });
 
-    const botReply = completion.choices[0].message.content;
+    const reply = completion.choices[0].message.content;
 
-    historialMensajes.push({
+    messages.push({
       role: "assistant",
-      content: botReply,
+      content: reply,
     });
 
-    res.json({ reply: botReply });
+    res.json({ reply });
 
   } catch (error) {
-    console.log(error);
-    res.status(500).json({ error: "Error OpenAI" });
+    console.error(error);
+    res.status(500).json({ error: "Error en OpenAI o servidor" });
   }
 });
 
-// IMPORTANTE: Render necesita puerto dinámico
+// 🔥 IMPORTANTE PARA RENDER
 const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, () => {
-  console.log("Servidor funcionando en puerto", PORT);
+  console.log("Servidor corriendo en puerto", PORT);
 });
