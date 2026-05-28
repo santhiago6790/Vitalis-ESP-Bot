@@ -2,42 +2,42 @@ import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 import OpenAI from "openai";
+import path from "path";
+import { fileURLToPath } from "url";
 
 dotenv.config();
 
 const app = express();
-
 app.use(cors());
 app.use(express.json());
 
-// 🔥 Render health check
+// 🔥 FIX RENDER PATHS
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// 🔥 SERVIR FRONTEND (IMPORTANTE)
+app.use(express.static(__dirname));
+
+// 🔥 HOME
 app.get("/", (req, res) => {
-  res.send("Vitalis API funcionando 🚀");
+  res.sendFile(path.join(__dirname, "index.html"));
 });
 
-// 🔑 OpenAI
+// 🔑 OPENAI
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
-// 🧠 memoria controlada (evita bugs)
+// 🧠 memoria simple
 let messages = [
   {
     role: "system",
-    content: `
-Eres Vitalis, un asistente médico virtual.
-
-Reglas:
-- Responde claro y humano
-- No repitas preguntas innecesarias
-- Si hay síntomas, da orientación médica básica
-- No preguntes lo mismo dos veces seguidas
-- Mantén conversación fluida tipo ChatGPT
-`
+    content:
+      "Eres Vitalis, asistente médico claro, humano y útil. No repitas preguntas innecesarias."
   }
 ];
 
-// 💬 CHAT ROUTE
+// 💬 CHAT
 app.post("/chat", async (req, res) => {
   try {
     const userMessage = req.body.message;
@@ -46,18 +46,15 @@ app.post("/chat", async (req, res) => {
       return res.status(400).json({ error: "Mensaje vacío" });
     }
 
-    // guardar usuario
     messages.push({
       role: "user",
       content: userMessage,
     });
 
-    // limitar memoria (MUY IMPORTANTE)
     if (messages.length > 12) {
       messages = [messages[0], ...messages.slice(-10)];
     }
 
-    // llamar IA
     const completion = await openai.chat.completions.create({
       model: "gpt-4o-mini",
       messages,
@@ -65,7 +62,6 @@ app.post("/chat", async (req, res) => {
 
     const reply = completion.choices[0].message.content;
 
-    // guardar respuesta
     messages.push({
       role: "assistant",
       content: reply,
@@ -73,16 +69,14 @@ app.post("/chat", async (req, res) => {
 
     res.json({ reply });
 
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({
-      error: "Error en OpenAI o servidor"
-    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Error OpenAI" });
   }
 });
 
 // 🔥 PORT RENDER
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 10000;
 
 app.listen(PORT, () => {
   console.log("Servidor corriendo en puerto", PORT);
