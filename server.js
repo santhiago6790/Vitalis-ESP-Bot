@@ -1,25 +1,62 @@
-async function askAI(message) {
-    try {
-        const response = await fetch("/chat", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({ message })
-        });
+import express from "express";
+import cors from "cors";
+import dotenv from "dotenv";
+import OpenAI from "openai";
+import path from "path";
+import { fileURLToPath } from "url";
 
-        const data = await response.json();
+dotenv.config();
 
-        console.log("RESPUESTA BACKEND:", data); // 🔥 IMPORTANTE DEBUG
+const app = express();
+app.use(cors());
+app.use(express.json());
 
-        if (!data.reply) {
-            return "Error: no llegó respuesta de la IA";
+// 🔥 FIX PATH RENDER
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// 🔥 VERIFICAR SI EXISTE INDEX.HTML
+app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname, "index.html"));
+});
+
+// 🔥 OPENAI
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY,
+});
+
+// 🔥 CHAT
+app.post("/chat", async (req, res) => {
+  try {
+    const userMessage = req.body.message;
+
+    const completion = await openai.chat.completions.create({
+      model: "gpt-4o-mini",
+      messages: [
+        {
+          role: "system",
+          content: "Eres Vitalis, asistente médico claro y útil."
+        },
+        {
+          role: "user",
+          content: userMessage
         }
+      ]
+    });
 
-        return data.reply;
+    res.json({
+      reply: completion.choices[0].message.content
+    });
 
-    } catch (error) {
-        console.error("ERROR FETCH:", error);
-        return "Error conectando con el servidor";
-    }
-}
+  } catch (err) {
+    console.error("ERROR:", err);
+    res.status(500).send("Error server");
+  }
+});
+
+// 🔥 PORT RENDER
+const PORT = process.env.PORT || 10000;
+
+app.listen(PORT, () => {
+  console.log("Servidor activo en puerto", PORT);
+});
