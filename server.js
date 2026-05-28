@@ -9,7 +9,7 @@ dotenv.config();
 
 const app = express();
 
-// ===== CONFIG PATH (para Render + HTML) =====
+// ===== PATH PARA RENDER =====
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -33,7 +33,7 @@ let messages = [
   {
     role: "system",
     content:
-      "Eres Vitalis, un asistente médico virtual claro, humano y directo. Ayudas con síntomas y salud de forma sencilla."
+      "Eres Vitalis, un asistente médico virtual claro, humano y directo. Respondes síntomas de forma sencilla y empática."
   }
 ];
 
@@ -46,18 +46,24 @@ app.post("/chat", async (req, res) => {
       return res.status(400).json({ error: "Mensaje vacío" });
     }
 
+    // Guardar mensaje usuario
     messages.push({
       role: "user",
       content: userMessage,
     });
 
+    // Llamada a OpenAI
     const completion = await openai.chat.completions.create({
-      model: "gpt-4o-mini",
+      model: "gpt-4o",
       messages,
     });
 
-    const reply = completion.choices[0].message.content;
+    // Respuesta segura (evita undefined)
+    const reply =
+      completion?.choices?.[0]?.message?.content ||
+      "No pude generar respuesta en este momento.";
 
+    // Guardar respuesta bot
     messages.push({
       role: "assistant",
       content: reply,
@@ -66,8 +72,11 @@ app.post("/chat", async (req, res) => {
     res.json({ reply });
 
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Error en OpenAI o servidor" });
+    console.error("ERROR OPENAI:", error);
+
+    res.status(500).json({
+      error: "Error en el servidor o OpenAI",
+    });
   }
 });
 
